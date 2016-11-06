@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:padding="20dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_marginBottom="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:maxLength="11"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:id="@+id/i"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/send_to"
+            android:inputType="phone"/>
+
+        <ImageView
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginEnd="10dp"
+            android:id="@+id/add_phone"
+            android:layout_gravity="center_vertical"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/add" />
+        <ImageView
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:id="@+id/j"
+            android:layout_gravity="center_vertical"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@mipmap/contact" />
+    </LinearLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/pool"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
+</LinearLayout>

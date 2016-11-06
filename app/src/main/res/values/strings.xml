@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">TemplateMSG</string>
+    <string name="cfm_tplt">lock template</string>
+    <string name="clear">clear</string>
+    <string name="send">send</string>
+    <string name="tplt_here">● Template here\n● Placeholder for variable is #var\n● Placeholder for contract name is #name (valid only when choosing telephone number from contract)</string>
+    <string name="send_to">Send to</string>
+    <string name="sms_succ">Sms sent successfully</string>
+    <string name="sms_fail">Sms sent failed</string>
+    <string name="cfm_sms">Confirm SMS</string>
+    <string name="ist_v">insert #var</string>
+    <string name="ist_n">insert #name</string>
+    <string name="in_prg">Sending message(s) </string>
+    <string name="snd_report">Report</string>
+    <string name="fail"> message(s) failed to send</string>
+    <string name="all_succ">All message(s) successfully sent</string>
+    <string name="resend">Resend failed messages</string>
+    <string name="back">Back to edit</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="empty_list">No target to send to</string>
+
+    <string name="cp_contact_tab_title">Contacts</string>
+    <string name="cp_group_tab_title">Groups</string>
+
+    <string name="cp_no_contacts">No Contacts</string>
+    <string name="cp_no_groups">No Groups</string>
+
+    <plurals
+        name="cp_group_description">
+        <item quantity="one">(%1$d contact)</item>
+        <item quantity="other">(%1$d contacts)</item>
+    </plurals>
+
+    <string name="cp_actionmode_selected">%d selected</string>
+
+    <string name="cp_limit_reached">You can\'t pick more than %d contacts!</string>
+</resources>

@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">模板化短信</string>
+    <string name="cfm_tplt">锁定模板</string>
+    <string name="clear">清空</string>
+    <string name="send">发送</string>
+    <string name="tplt_here">● 此处输入模板\n● 变量占位符为 #var\n● 通讯录姓名占位符为 #name (仅当从通讯录中选取号码时有效)</string>
+    <string name="send_to">发送给</string>
+    <string name="sms_succ">短信发送成功</string>
+    <string name="sms_fail">短信发送失败</string>
+    <string name="cfm_sms">确认短信内容</string>
+    <string name="ist_v">插入 #var</string>
+    <string name="ist_n">插入 #name</string>
+    <string name="in_prg">正在发送短信 </string>
+    <string name="snd_report">报告</string>
+    <string name="fail">条短信发送失败</string>
+    <string name="all_succ">所有短信发送成功</string>
+    <string name="resend">重新发送失败短信</string>
+    <string name="back">继续编辑</string>
+    <string name="cancel">取消</string>
+    <string name="ok">好的</string>
+    <string name="empty_list">没有添加发送目标</string>
+
+    <string name="cp_contact_tab_title">联系人</string>
+    <string name="cp_group_tab_title">群组</string>
+
+    <string name="cp_no_contacts">无联系人</string>
+    <string name="cp_no_groups">无群组</string>
+
+    <plurals
+        name="cp_group_description">
+        <item quantity="one">(%1$d个联系人)</item>
+        <item quantity="other">(%1$d个联系人)</item>
+    </plurals>
+
+    <string name="cp_actionmode_selected">已选择%d个</string>
+
+    <string name="cp_limit_reached">你无法选择%d个以上的联系人!</string>
+</resources>
