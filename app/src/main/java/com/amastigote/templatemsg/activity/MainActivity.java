@@ -42,14 +42,6 @@ import java.util.Map;
 
 import static com.amastigote.templatemsg.module.PermissionUtils.chk_pem;
 
-/*
-    todo: there should be a delivery report...
- */
-
-/*
-    todo: there will be a 'about' menu item, menu's xml is ready...
- */
-
 @SuppressWarnings("ALL")
 public class MainActivity extends AppCompatActivity {
     final private String var_symbol = "#var";
@@ -371,8 +363,7 @@ public class MainActivity extends AppCompatActivity {
 
             List<Group> groups = (List<Group>) data.getSerializableExtra(ContactPickerActivity.RESULT_GROUP_DATA);
             for (Group group : groups) {
-                List<Contact> contacts_from_group = (List<Contact>) group.getContacts();
-                for (Contact contact : contacts_from_group) {
+                for (Contact contact : group.getContacts()) {
                     View v = layoutInflater.inflate(R.layout.sms_item, null);
 
                     TextView t_a = (TextView) v.findViewById(R.id.si_contact);

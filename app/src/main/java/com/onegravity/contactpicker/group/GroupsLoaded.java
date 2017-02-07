@@ -39,7 +39,7 @@ public class GroupsLoaded {
         EventBus.getDefault().postSticky(event);
     }
 
-    public List<? extends Group> getGroups() {
+    List<? extends Group> getGroups() {
         return mGroups;
     }
 

@@ -27,7 +27,5 @@ import java.util.Collection;
  * Write access is only possible through the GroupImpl class which has package access.
  */
 public interface Group extends ContactElement {
-
     Collection<Contact> getContacts();
-
 }

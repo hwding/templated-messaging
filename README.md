@@ -8,6 +8,7 @@
 ## UPDATE LOG
 ##### 2017/02/07
   - fix a crash if there are no contacts (related to the fast scroll library)
+  - fix a crash after group(s) is selected
 
 ##### 2016/11/06  
   - add support for multiple-contact
