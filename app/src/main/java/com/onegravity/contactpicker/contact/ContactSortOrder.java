@@ -26,8 +26,7 @@ public enum ContactSortOrder {
     public static ContactSortOrder lookup(String name) {
         try {
             return ContactSortOrder.valueOf(name);
-        }
-        catch (IllegalArgumentException ignore) {
+        } catch (IllegalArgumentException ignore) {
             Log.e(ContactSortOrder.class.getSimpleName(), ignore.getMessage());
             return AUTOMATIC;
         }

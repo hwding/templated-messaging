@@ -81,14 +81,14 @@ public class ContactPickerActivity extends AppCompatActivity implements
     /**
      * Use this parameter to determine whether the contact picture shows a contact badge and if yes
      * what type (round, square).
-     *
+     * <p>
      * {@link com.onegravity.contactpicker.picture.ContactPictureType}
      */
     public static final String EXTRA_CONTACT_BADGE_TYPE = "EXTRA_CONTACT_BADGE_TYPE";
 
     /**
      * Use this to define what contact information is used for the description field (second line).
-     *
+     * <p>
      * {@link com.onegravity.contactpicker.contact.ContactDescription}
      */
     public static final String EXTRA_CONTACT_DESCRIPTION = "EXTRA_CONTACT_DESCRIPTION";
@@ -119,43 +119,43 @@ public class ContactPickerActivity extends AppCompatActivity implements
     /**
      * This defines which type is shown in the description. It refines the EXTRA_CONTACT_DESCRIPTION
      * parameter and uses the android.provider.ContactsContract.CommonDataKinds values
-     *
+     * <p>
      * If the description is PHONE then this parameter needs to match one of the
      * ContactsContract.CommonDataKinds.Email.ContactsContract.CommonDataKinds.Phone.TYPE values:
-     *
+     * <p>
      * - TYPE_CUSTOM, TYPE_HOME, TYPE_MOBILE, TYPE_WORK, TYPE_FAX_WORK, TYPE_FAX_HOME, TYPE_PAGER
      * - TYPE_OTHER, TYPE_CALLBACK, TYPE_CAR, TYPE_COMPANY_MAIN, TYPE_ISDN, TYPE_MAIN
      * - TYPE_OTHER_FAX, TYPE_RADIO, TYPE_TELEX, TYPE_TTY_TDD, TYPE_WORK_MOBILE, TYPE_WORK_PAGER
      * - TYPE_ASSISTANT, TYPE_MMS
-     *
+     * <p>
      * (https://developer.android.com/reference/android/provider/ContactsContract.CommonDataKinds.Phone.html)
-     *
+     * <p>
      * If the description is EMAIL then this parameter needs to match one of the
      * ContactsContract.CommonDataKinds.Email.TYPE values:
-     *
+     * <p>
      * - TYPE_CUSTOM
      * - TYPE_HOME
      * - TYPE_WORK
      * - TYPE_OTHER
      * - TYPE_MOBILE
-     *
+     * <p>
      * (https://developer.android.com/reference/android/provider/ContactsContract.CommonDataKinds.Email.html)
-     *
+     * <p>
      * If the description is ADDRESS then this parameter needs to match one of the
      * ContactsContract.CommonDataKinds.StructuredPostal.TYPE values:
-     *
+     * <p>
      * - TYPE_CUSTOM
      * - TYPE_HOME
      * - TYPE_WORK
      * - TYPE_OTHER
-     *
+     * <p>
      * (https://developer.android.com/reference/android/provider/ContactsContract.CommonDataKinds.StructuredPostal.html)
      */
     public static final String EXTRA_CONTACT_DESCRIPTION_TYPE = "EXTRA_CONTACT_DESCRIPTION_TYPE";
 
     /**
      * Use this to define the sorting order for contacts
-     *
+     * <p>
      * {@link com.onegravity.contactpicker.contact.ContactSortOrder}
      */
     public static final String EXTRA_CONTACT_SORT_ORDER = "EXTRA_CONTACT_SORT_ORDER";
@@ -169,40 +169,159 @@ public class ContactPickerActivity extends AppCompatActivity implements
      * We put the resulting group list into the Intent as extra data with this key.
      */
     public static final String RESULT_GROUP_DATA = "RESULT_GROUP_DATA";
-
-    private int mThemeResId;
-
-    private ContactPictureType mBadgeType = ContactPictureType.ROUND;
-
-    private int mDescriptionType = ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME;
-    private ContactDescription mDescription = ContactDescription.ADDRESS;
-
-    private ContactSortOrder mSortOrder = ContactSortOrder.AUTOMATIC;
-
-    private PagerAdapter mAdapter;
-
-    private String mDefaultTitle;
-
-    private Boolean mShowCheckAll = true;
-
     // update the adapter after a certain amount of contacts has loaded
     private static final int BATCH_SIZE = 50;
-
     /*
      * The selected ids are saved in onSaveInstanceState, restored in onCreate and then applied to
      * the contacts and groups in onLoadFinished.
      */
     private static final String CONTACT_IDS = "CONTACT_IDS";
+    private static final String GROUP_IDS = "GROUP_IDS";
+    /*
+     * Loader configuration contacts
+     */
+    private static final int CONTACTS_LOADER_ID = 0;
+    private static final Uri CONTACTS_URI = ContactsContract.Contacts.CONTENT_URI;
+    private static final String[] CONTACTS_PROJECTION = new String[]{
+            ContactsContract.Contacts._ID,
+            ContactsContract.Contacts.LOOKUP_KEY,
+            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
+            ContactsContract.Contacts.PHOTO_THUMBNAIL_URI};
+    private static final String CONTACTS_SORT = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " COLLATE LOCALIZED ASC";
+    /*
+     * Loader configuration contacts details
+     */
+    private static final int CONTACT_DETAILS_LOADER_ID = 1;
+    private static final Uri CONTACT_DETAILS_URI = ContactsContract.Data.CONTENT_URI;
+    private static final String[] CONTACT_DETAILS_PROJECTION = {
+            ContactsContract.Data.LOOKUP_KEY,
+            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
+            ContactsContract.Data.MIMETYPE,
+            FORMATTED_ADDRESS,
+            ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
+            ContactsContract.CommonDataKinds.Phone.NUMBER,
+            ContactsContract.CommonDataKinds.Phone.TYPE,
+            ContactsContract.CommonDataKinds.Email.ADDRESS,
+            ContactsContract.CommonDataKinds.Email.TYPE,
+            ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
+            ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
+            ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID,
+    };
+    /*
+     * Loader configuration groups
+     */
+    private static final int GROUPS_LOADER_ID = 2;
+    private static final Uri GROUPS_URI = ContactsContract.Groups.CONTENT_URI;
+    private static final String[] GROUPS_PROJECTION = new String[]{
+            ContactsContract.Groups._ID,
+            ContactsContract.Groups.TITLE};
+    private static final String GROUPS_SELECTION = ContactsContract.Groups.DELETED + " = 0";
+    private static final String GROUPS_SORT = ContactsContract.Groups.TITLE + " COLLATE LOCALIZED ASC";
+    private int mThemeResId;
+
+    // ****************************************** Lifecycle Methods *******************************************
+    private ContactPictureType mBadgeType = ContactPictureType.ROUND;
+    private int mDescriptionType = ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME;
+    private ContactDescription mDescription = ContactDescription.ADDRESS;
+    private ContactSortOrder mSortOrder = ContactSortOrder.AUTOMATIC;
+    private PagerAdapter mAdapter;
+    private String mDefaultTitle;
+    private Boolean mShowCheckAll = true;
     private HashSet<Long> mSelectedContactIds = new HashSet<>();
 
-    private static final String GROUP_IDS = "GROUP_IDS";
+    // ****************************************** Loader Methods *******************************************
     private HashSet<Long> mSelectedGroupIds = new HashSet<>();
-
     private String mLimitReachedMessage;
     private int mSelectContactsLimit = 0;
     private Boolean mOnlyWithPhoneNumbers = false;
+    /*
+     * List of all contacts.
+     */
+    private List<ContactImpl> mContacts = new ArrayList<>();
+    /*
+     * Map of all contacts by lookup key (ContactsContract.Contacts.LOOKUP_KEY).
+     * We use this to find the contacts when the contact details are loaded.
+     */
+    private Map<String, ContactImpl> mContactsByLookupKey = new HashMap<>();
+    /*
+     * Number of selected contacts.
+     * Selected groups are reflected in this too.
+     */
+    private int mNrOfSelectedContacts = 0;
+    private Comparator<ContactImpl> mContactComparator = new Comparator<ContactImpl>() {
+        @Override
+        public int compare(ContactImpl lhs, ContactImpl rhs) {
+            switch (mSortOrder) {
+                case FIRST_NAME:
+                    return lhs.getFirstName().compareToIgnoreCase(rhs.getFirstName());
+                case LAST_NAME:
+                    return lhs.getLastName().compareToIgnoreCase(rhs.getLastName());
+                default:
+                    return lhs.getDisplayName().compareToIgnoreCase(rhs.getDisplayName());
+            }
+        }
+    };
+    /*
+     * List of all groups.
+     */
+    private List<GroupImpl> mGroups = new ArrayList<>();
+    /*
+     * Map of all groups by id (ContactsContract.Groups._ID).
+     * We use this to find the group when joining contacts and groups.
+     */
+    private Map<Long, GroupImpl> mGroupsById = new HashMap<>();
+    /*
+     * List of all visible groups.
+     * Only groups with contacts will be shown / visible.
+     */
+    private List<GroupImpl> mVisibleGroups = new ArrayList<>();
+    /**
+     * Listening to onContactChecked for contacts because we need to update the title to reflect
+     * the number of selected contacts and we also want to un-check groups if none of their contacts
+     * are checked any more.
+     */
+    private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
+        @Override
+        public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
+            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
+                    mNrOfSelectedContacts + 1 > mSelectContactsLimit) {
+                contact.setChecked(false, true);
+                ContactsLoaded.post(mContacts);
+                Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
+                        Toast.LENGTH_LONG).show();
+            } else if (wasChecked != isChecked) {
+                mNrOfSelectedContacts += isChecked ? 1 : -1;
+                mNrOfSelectedContacts = Math.min(mContacts.size(), Math.max(0, mNrOfSelectedContacts));
+                updateTitle();
 
-    // ****************************************** Lifecycle Methods *******************************************
+                if (!isChecked) {
+                    processGroupSelection();
+                }
+            }
+        }
+    };
+    /**
+     * Check/un-check a group's contacts if the user checks/un-checks a group.
+     */
+    private OnContactCheckedListener<Group> mGroupListener = new OnContactCheckedListener<Group>() {
+        @Override
+        public void onContactChecked(Group group, boolean wasChecked, boolean isChecked) {
+            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
+                    mNrOfSelectedContacts + group.getContacts().size() > mSelectContactsLimit) {
+                group.setChecked(false, true);
+                GroupsLoaded.post(mVisibleGroups);
+                Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
+                        Toast.LENGTH_LONG).show();
+            } else {
+                // check/un-check the group's contacts
+                processContactSelection(group, isChecked);
+                // check if we need to deselect some groups
+                processGroupSelection();
+            }
+
+
+        }
+    };
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -221,8 +340,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
             PackageManager pckMgr = getPackageManager();
             int uid = pckMgr.getApplicationInfo(getComponentName().getPackageName(), PackageManager.GET_META_DATA).uid;
             enforcePermission(Manifest.permission.READ_CONTACTS, pid, uid, "Contact permission hasn't been granted to this app, terminating.");
-        }
-        catch (PackageManager.NameNotFoundException | SecurityException e) {
+        } catch (PackageManager.NameNotFoundException | SecurityException e) {
             Log.e(getClass().getSimpleName(), e.getMessage());
             finish();
             return;
@@ -237,14 +355,12 @@ public class ContactPickerActivity extends AppCompatActivity implements
                 PackageManager pkMgr = getPackageManager();
                 ActivityInfo activityInfo = pkMgr.getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
                 mDefaultTitle = activityInfo.loadLabel(pkMgr).toString();
-            }
-            catch (PackageManager.NameNotFoundException ignore) {
+            } catch (PackageManager.NameNotFoundException ignore) {
                 mDefaultTitle = getTitle().toString();
             }
 
             mThemeResId = intent.getIntExtra(EXTRA_THEME, R.style.ContactPicker_Theme_Light);
-        }
-        else {
+        } else {
             mDefaultTitle = savedInstanceState.getString("mDefaultTitle");
 
             mThemeResId = savedInstanceState.getInt("mThemeResId");
@@ -253,8 +369,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
             try {
                 mSelectedContactIds = (HashSet<Long>) savedInstanceState.getSerializable(CONTACT_IDS);
                 mSelectedGroupIds = (HashSet<Long>) savedInstanceState.getSerializable(GROUP_IDS);
+            } catch (ClassCastException ignore) {
             }
-            catch (ClassCastException ignore) {}
         }
 
         /*
@@ -282,10 +398,9 @@ public class ContactPickerActivity extends AppCompatActivity implements
          * Retrieve LimitReachedMessage.
          */
         String limitMsg = intent.getStringExtra(EXTRA_LIMIT_REACHED_MESSAGE);
-        if(limitMsg != null){
+        if (limitMsg != null) {
             mLimitReachedMessage = limitMsg;
-        }
-        else {
+        } else {
             mLimitReachedMessage = getString(R.string.cp_limit_reached, mSelectContactsLimit);
         }
 
@@ -330,10 +445,14 @@ public class ContactPickerActivity extends AppCompatActivity implements
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
             }
+
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
         });
     }
 
@@ -346,6 +465,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
         getSupportLoaderManager().initLoader(CONTACTS_LOADER_ID, null, this);
         getSupportLoaderManager().initLoader(GROUPS_LOADER_ID, null, this);
     }
+
+    // ****************************************** Contact Methods *******************************************
 
     @Override
     protected void onPause() {
@@ -362,18 +483,20 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
         outState.putInt("mThemeResId", mThemeResId);
 
-        mSelectedContactIds.clear();;
+        mSelectedContactIds.clear();
+        ;
         for (Contact contact : mContacts) {
             if (contact.isChecked()) {
-                mSelectedContactIds.add( contact.getId() );
+                mSelectedContactIds.add(contact.getId());
             }
         }
         outState.putSerializable(CONTACT_IDS, mSelectedContactIds);
 
-        mSelectedGroupIds.clear();;
+        mSelectedGroupIds.clear();
+        ;
         for (Group group : mGroups) {
             if (group.isChecked()) {
-                mSelectedGroupIds.add( group.getId() );
+                mSelectedGroupIds.add(group.getId());
             }
         }
         outState.putSerializable(GROUP_IDS, mSelectedGroupIds);
@@ -382,8 +505,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private void updateTitle() {
         if (mNrOfSelectedContacts == 0) {
             setTitle(mDefaultTitle);
-        }
-        else {
+        } else {
             String title = getString(R.string.cp_actionmode_selected, mNrOfSelectedContacts);
             setTitle(title);
         }
@@ -393,7 +515,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.cp_contact_picker, menu);
-        if(!mShowCheckAll){
+        if (!mShowCheckAll) {
             MenuItem checkAllBtn = menu.findItem(R.id.action_check_all);
             checkAllBtn.setVisible(mShowCheckAll);
         }
@@ -403,12 +525,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if( id == android.R.id.home) {
+        if (id == android.R.id.home) {
             setResult(Activity.RESULT_CANCELED, null);
             finish();
             return true;
-        }
-        else if( id == R.id.action_done) {
+        } else if (id == R.id.action_done) {
             onDone();
             return true;
         }
@@ -444,58 +565,13 @@ public class ContactPickerActivity extends AppCompatActivity implements
         finish();
     }
 
-    // ****************************************** Loader Methods *******************************************
-
-    /*
-     * Loader configuration contacts
-     */
-    private static final int CONTACTS_LOADER_ID = 0;
-    private static final Uri CONTACTS_URI = ContactsContract.Contacts.CONTENT_URI;
-    private static final String[] CONTACTS_PROJECTION = new String[] {
-            ContactsContract.Contacts._ID,
-            ContactsContract.Contacts.LOOKUP_KEY,
-            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
-            ContactsContract.Contacts.PHOTO_THUMBNAIL_URI};
-    private static final String CONTACTS_SORT = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " COLLATE LOCALIZED ASC";
-
-    /*
-     * Loader configuration contacts details
-     */
-    private static final int CONTACT_DETAILS_LOADER_ID = 1;
-    private static final Uri CONTACT_DETAILS_URI = ContactsContract.Data.CONTENT_URI;
-    private static final String[] CONTACT_DETAILS_PROJECTION = {
-            ContactsContract.Data.LOOKUP_KEY,
-            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
-            ContactsContract.Data.MIMETYPE,
-            FORMATTED_ADDRESS,
-            ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
-            ContactsContract.CommonDataKinds.Phone.NUMBER,
-            ContactsContract.CommonDataKinds.Phone.TYPE,
-            ContactsContract.CommonDataKinds.Email.ADDRESS,
-            ContactsContract.CommonDataKinds.Email.TYPE,
-            ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
-            ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
-            ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID,
-    };
-
-    /*
-     * Loader configuration groups
-     */
-    private static final int GROUPS_LOADER_ID = 2;
-    private static final Uri GROUPS_URI = ContactsContract.Groups.CONTENT_URI;
-    private static final String[] GROUPS_PROJECTION = new String[] {
-            ContactsContract.Groups._ID,
-            ContactsContract.Groups.TITLE};
-    private static final String GROUPS_SELECTION = ContactsContract.Groups.DELETED + " = 0";
-    private static final String GROUPS_SORT = ContactsContract.Groups.TITLE + " COLLATE LOCALIZED ASC";
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String selection = "";
-        if(mOnlyWithPhoneNumbers){
+        if (mOnlyWithPhoneNumbers) {
             selection = ContactsContract.Contacts.HAS_PHONE_NUMBER;
         }
-        switch(id) {
+        switch (id) {
             case CONTACTS_LOADER_ID:
                 return new CursorLoader(this, CONTACTS_URI, CONTACTS_PROJECTION,
                         selection, null, CONTACTS_SORT);
@@ -514,9 +590,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
         GroupsLoaded.post(null);
     }
 
+    // ****************************************** Group Methods *******************************************
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        switch(loader.getId()) {
+        switch (loader.getId()) {
             case CONTACTS_LOADER_ID:
                 readContacts(cursor);
                 // contacts loaded --> load the contact details
@@ -534,36 +612,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
     }
 
-    // ****************************************** Contact Methods *******************************************
-
-    /*
-     * List of all contacts.
-     */
-    private List<ContactImpl> mContacts = new ArrayList<>();
-
-    /*
-     * Map of all contacts by lookup key (ContactsContract.Contacts.LOOKUP_KEY).
-     * We use this to find the contacts when the contact details are loaded.
-     */
-    private Map<String, ContactImpl> mContactsByLookupKey = new HashMap<>();
-
-    /*
-     * Number of selected contacts.
-     * Selected groups are reflected in this too.
-     */
-    private int mNrOfSelectedContacts = 0;
-
-    private Comparator<ContactImpl> mContactComparator = new Comparator<ContactImpl>() {
-        @Override
-        public int compare(ContactImpl lhs, ContactImpl rhs) {
-            switch(mSortOrder) {
-                case FIRST_NAME: return lhs.getFirstName().compareToIgnoreCase(rhs.getFirstName());
-                case LAST_NAME: return lhs.getLastName().compareToIgnoreCase(rhs.getLastName());
-                default: return lhs.getDisplayName().compareToIgnoreCase(rhs.getDisplayName());
-            }
-        }
-    };
-
     private void readContacts(Cursor cursor) {
         mContacts.clear();
         mContactsByLookupKey.clear();
@@ -580,7 +628,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
                 String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
                 mContactsByLookupKey.put(lookupKey, contact);
 
-                boolean isChecked = mSelectedContactIds.contains( contact.getId() );
+                boolean isChecked = mSelectedContactIds.contains(contact.getId());
                 contact.setChecked(isChecked, true);
                 mNrOfSelectedContacts += isChecked ? 1 : 0;
 
@@ -630,6 +678,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
         joinContactsAndGroups(mContacts);
     }
 
+    // ****************************************** Process Contacts / Groups *******************************************
+
     private void readContactDetails(Cursor cursor, ContactImpl contact) {
         String mime = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE));
         if (mime.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
@@ -638,51 +688,28 @@ public class ContactPickerActivity extends AppCompatActivity implements
             if (email != null) {
                 contact.setEmail(type, email);
             }
-        }
-        else if (mime.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
+        } else if (mime.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
             String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
             int type = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
             if (phone != null) {
                 contact.setPhone(type, phone);
             }
-        }
-        else if (mime.equals(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE)) {
+        } else if (mime.equals(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE)) {
             String address = cursor.getString(cursor.getColumnIndex(FORMATTED_ADDRESS));
             int type = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE));
             if (address != null) {
                 contact.setAddress(type, address.replaceAll("\\n", ", "));
             }
-        }
-        else if (mime.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
+        } else if (mime.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
             String firstName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
             String lastName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
             if (firstName != null) contact.setFirstName(firstName);
             if (lastName != null) contact.setLastName(lastName);
-        }
-        else if (mime.equals(ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE)) {
+        } else if (mime.equals(ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE)) {
             int groupId = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID));
             contact.addGroupId(groupId);
         }
     }
-
-    // ****************************************** Group Methods *******************************************
-
-    /*
-     * List of all groups.
-     */
-    private List<GroupImpl> mGroups = new ArrayList<>();
-
-    /*
-     * Map of all groups by id (ContactsContract.Groups._ID).
-     * We use this to find the group when joining contacts and groups.
-     */
-    private Map<Long, GroupImpl> mGroupsById = new HashMap<>();
-
-    /*
-     * List of all visible groups.
-     * Only groups with contacts will be shown / visible.
-     */
-    private List<GroupImpl> mVisibleGroups = new ArrayList<>();
 
     private void readGroups(Cursor cursor) {
         mGroups.clear();
@@ -697,7 +724,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
                 mGroups.add(group);
                 mGroupsById.put(group.getId(), group);
 
-                boolean isChecked = mSelectedGroupIds.contains( group.getId() );
+                boolean isChecked = mSelectedGroupIds.contains(group.getId());
                 group.setChecked(isChecked, true);
 
                 group.addOnContactCheckedListener(mGroupListener);
@@ -707,8 +734,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
         GroupsLoaded.post(mVisibleGroups);
         joinContactsAndGroups(mContacts);
     }
-
-    // ****************************************** Process Contacts / Groups *******************************************
 
     /**
      * Join contacts and groups.
@@ -723,7 +748,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
             for (Long groupId : contact.getGroupIds()) {
                 GroupImpl group = mGroupsById.get(groupId);
                 if (group != null) {
-                    if (! group.hasContacts()) {
+                    if (!group.hasContacts()) {
                         mVisibleGroups.add(group);
                     }
                     group.addContact(contact);
@@ -740,55 +765,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
         GroupsLoaded.post(mVisibleGroups);
     }
-
-    /**
-     * Listening to onContactChecked for contacts because we need to update the title to reflect
-     * the number of selected contacts and we also want to un-check groups if none of their contacts
-     * are checked any more.
-     */
-    private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
-        @Override
-        public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
-            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
-                    mNrOfSelectedContacts+1 > mSelectContactsLimit ){
-                contact.setChecked(false, true);
-                ContactsLoaded.post(mContacts);
-                Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
-                        Toast.LENGTH_LONG).show();
-            } else if (wasChecked != isChecked) {
-                mNrOfSelectedContacts += isChecked ? 1 : -1;
-                mNrOfSelectedContacts = Math.min(mContacts.size(), Math.max(0, mNrOfSelectedContacts));
-                updateTitle();
-
-                if (! isChecked) {
-                    processGroupSelection();
-                }
-            }
-        }
-    };
-
-    /**
-     * Check/un-check a group's contacts if the user checks/un-checks a group.
-     */
-    private OnContactCheckedListener<Group> mGroupListener = new OnContactCheckedListener<Group>() {
-        @Override
-        public void onContactChecked(Group group, boolean wasChecked, boolean isChecked) {
-            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
-                    mNrOfSelectedContacts + group.getContacts().size() > mSelectContactsLimit ){
-                group.setChecked(false, true);
-                GroupsLoaded.post(mVisibleGroups);
-                Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
-                        Toast.LENGTH_LONG).show();
-            } else {
-                // check/un-check the group's contacts
-                processContactSelection(group, isChecked);
-                // check if we need to deselect some groups
-                processGroupSelection();
-            }
-
-
-        }
-    };
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ContactSelectionChanged event) {
@@ -869,7 +845,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
             }
         }
 
-        if (! isSelected && group.isChecked()) {
+        if (!isSelected && group.isChecked()) {
             // no contact selected
             group.setChecked(false, true);
             return true;

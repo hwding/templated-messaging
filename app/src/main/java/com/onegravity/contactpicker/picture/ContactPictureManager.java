@@ -33,28 +33,26 @@ import java.util.concurrent.Executors;
 
 /**
  * Use this class to load contact pictures for ContactBadges.
- *
+ * <p>
  * It manages the asynchronous loading of contact pictures and caches Uris and Bitmaps to make
  * sure device resources are used efficiently.
  */
 public class ContactPictureManager {
-    private static Bitmap sDummyBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565);
-
     private static final ExecutorService sExecutor = Executors.newFixedThreadPool(2);
-
+    private static Bitmap sDummyBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565);
     private final ContactPictureCache sPhotoCache;
 
     private final boolean mRoundContactPictures;
 
     public ContactPictureManager(Context context, boolean roundContactPictures) {
-        sPhotoCache = ContactPictureCache.getInstance( context );
+        sPhotoCache = ContactPictureCache.getInstance(context);
         mRoundContactPictures = roundContactPictures;
         EventBus.getDefault().register(this);
     }
 
     /**
      * Load a contact picture and display it using the supplied {@link ContactBadge} instance.
-     *
+     * <p>
      * <p>
      * If a picture is found in the cache, it is displayed in the {@code ContactBadge}
      * immediately. Otherwise a {@link ContactPictureLoader} is started to try to load the
@@ -71,7 +69,7 @@ public class ContactPictureManager {
             photoUri = ContactUriCache.getUriFromCache(key);
             if (photoUri == Uri.EMPTY) {
                 // pseudo uri used as key to retrieve Uris from the cache
-                photoUri = Uri.parse("picture://1gravity.com/"  + Uri.encode(key));
+                photoUri = Uri.parse("picture://1gravity.com/" + Uri.encode(key));
                 ContactUriCache.getInstance().put(key, photoUri);
             }
         }
@@ -81,20 +79,16 @@ public class ContactPictureManager {
 
         if (bitmap != null && bitmap != sDummyBitmap) {
             // 1) picture found --> update the contact badge
-            badge.setBitmap( bitmap );
-        }
-
-        else if (photoUri == Uri.EMPTY || bitmap == sDummyBitmap) {
+            badge.setBitmap(bitmap);
+        } else if (photoUri == Uri.EMPTY || bitmap == sDummyBitmap) {
             // 2) we already tried to retrieve the contact picture before (unsuccessfully)
             // --> "letter" contact image
             badge.setCharacter(contact.getContactLetter(), contact.getContactColor());
-        }
-
-        else {
+        } else {
             synchronized (badge) {
                 boolean hasLoaderAssociated = hasLoaderAssociated(key, badge);
 
-                if (! hasLoaderAssociated) {
+                if (!hasLoaderAssociated) {
                     // 3a) temporary "letter" contact image till the contact picture is loaded (if there's any)
                     badge.setCharacter(contact.getContactLetter(), contact.getContactColor());
 
@@ -103,8 +97,8 @@ public class ContactPictureManager {
                     badge.setKey(key);
                     try {
                         sExecutor.execute(loader);
+                    } catch (Exception ignore) {
                     }
-                    catch (Exception ignore) {}
                 }
             }
         }
@@ -112,7 +106,7 @@ public class ContactPictureManager {
 
     /**
      * @return {@code true}, if a loader with the same key has already been started for this
-     *         ContactBadge, {@code false} otherwise.
+     * ContactBadge, {@code false} otherwise.
      */
     private boolean hasLoaderAssociated(String loaderKey, ContactBadge badge) {
         String badgeKey = badge.getKey();
@@ -137,7 +131,7 @@ public class ContactPictureManager {
         String loaderKey = event.getKey();
 
         if (badgeKey != null && loaderKey != null && badgeKey.equals(loaderKey)) {
-            badge.setBitmap( event.getBitmap() );
+            badge.setBitmap(event.getBitmap());
         }
     }
 

@@ -33,44 +33,24 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
 
     // Both hard and soft caches are purged after n seconds idling.
     private final int mDelayBeforePurge;
-
+    private final HardLruCache mHardCacheMap;
+    protected boolean mDebug;
     private Handler mPurgeHandler;
     private Runnable mPurger;
-
-    private final HardLruCache mHardCacheMap;
-
     // Soft object cache for objects removed from the hard cache
     // this gets cleared by the Garbage Collector every time we get low on memory
     private ConcurrentHashMap<K, SoftReference<V>> mSoftCache;
-
     // this cache keeps track of misses
     // the caller can use this to decide whether to attempt to retrieve the value
     // (which might be very expensive) or not depending on whether a previous miss has occurred
     private Set<K> mMissCache;
-
-    protected boolean mDebug;
-
-    protected class HardLruCache extends LruCache<K, V> {
-        public HardLruCache(int initialCapacity) {
-            super(initialCapacity);
-        }
-
-        @Override
-        protected void entryRemoved (boolean evicted, K key, V oldValue, V newValue) {
-            // move the removed item to the soft cache
-            mSoftCache.put(key, new SoftReference<V>(newValue));
-        }
-    }
-
-    // ****************************************** Public Methods *******************************************
 
     protected InMemoryCache(int delayBeforePurge, int cacheCapacity) {
         mDelayBeforePurge = delayBeforePurge;
 
         try {
             mPurgeHandler = new Handler();
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             // can't create handler inside thread that has not called Looper.prepare()
             // --> we need to create our own Looper thread
             new Thread(new Runnable() {
@@ -90,6 +70,8 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
         mHardCacheMap = createHardLruCache(cacheCapacity);
     }
 
+    // ****************************************** Public Methods *******************************************
+
     protected HardLruCache createHardLruCache(int cacheCapacity) {
         return new HardLruCache(cacheCapacity);
     }
@@ -106,7 +88,8 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
     @Override
     public synchronized void put(K key, V value) {
         if (key != null) {
-            if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".put(" + key + "): " + value);
+            if (mDebug)
+                Log.e("1gravity", getClass().getSimpleName() + ".put(" + key + "): " + value);
             mHardCacheMap.put(key, value);
             mMissCache.remove(key);
         }
@@ -116,7 +99,7 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
      * As the name suggests, this method attempts to obtain a Object stored in one of the caches.
      * First it checks the hard cache for the key.
      * If a key is found, it moves the cached Object to the head of the cache so it gets moved to the soft cache last.
-     *
+     * <p>
      * If the hard cache doesn't contain the Object, it checks the soft cache for the cached Object.
      * If neither of the caches contain the Object, this returns null.
      */
@@ -127,19 +110,20 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
 
         if (key != null) {
             V value = mHardCacheMap.get(key);
-            if(value != null) {
-                if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): hit");
+            if (value != null) {
+                if (mDebug)
+                    Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): hit");
                 return value;
             }
 
             SoftReference<V> objectRef = mSoftCache.get(key);
-            if(objectRef != null){
+            if (objectRef != null) {
                 value = objectRef.get();
-                if(value != null){
-                    if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): hit");
+                if (value != null) {
+                    if (mDebug)
+                        Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): hit");
                     return value;
-                }
-                else {
+                } else {
                     // must have been collected by the Garbage Collector so we remove the bucket from the cache.
                     mSoftCache.remove(key);
                 }
@@ -152,9 +136,9 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
 
     /**
      * This get method returns:
-     *  1) the cached value if one exists in the cache
-     *  2) the missedValue if a previous cache miss has occurred before
-     *  3) null in every other case
+     * 1) the cached value if one exists in the cache
+     * 2) the missedValue if a previous cache miss has occurred before
+     * 3) null in every other case
      */
     public synchronized V get(K key, V missedValue) {
         if (key != null) {
@@ -164,21 +148,13 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
                 return result;
             }
             if (hadMiss) {
-                if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): miss repeatedly");
+                if (mDebug)
+                    Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): miss repeatedly");
                 return missedValue;
             }
             if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): miss");
         }
         return null;
-    }
-
-    // ****************************************** Private Classes + Methods *******************************************
-
-    private class Purger implements Runnable {
-        @Override
-        public void run() {
-            clearCaches();
-        }
     }
 
     private void clearCaches() {
@@ -187,20 +163,41 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
         mHardCacheMap.evictAll();
     }
 
+    // ****************************************** Private Classes + Methods *******************************************
+
     /**
      * Stops the cache purger from running until it is reset again.
      */
     private void stopPurgeTimer() {
-        if (mPurgeHandler!=null) mPurgeHandler.removeCallbacks(mPurger);
+        if (mPurgeHandler != null) mPurgeHandler.removeCallbacks(mPurger);
     }
 
     /**
      * Purges the cache every (DELAY_BEFORE_PURGE) milliseconds.
      */
     private void resetPurgeTimer() {
-        if (mPurgeHandler!=null) {
+        if (mPurgeHandler != null) {
             mPurgeHandler.removeCallbacks(mPurger);
             mPurgeHandler.postDelayed(mPurger, mDelayBeforePurge);
+        }
+    }
+
+    protected class HardLruCache extends LruCache<K, V> {
+        public HardLruCache(int initialCapacity) {
+            super(initialCapacity);
+        }
+
+        @Override
+        protected void entryRemoved(boolean evicted, K key, V oldValue, V newValue) {
+            // move the removed item to the soft cache
+            mSoftCache.put(key, new SoftReference<V>(newValue));
+        }
+    }
+
+    private class Purger implements Runnable {
+        @Override
+        public void run() {
+            clearCaches();
         }
     }
 

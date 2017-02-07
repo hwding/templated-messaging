@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:background="#FFFFFF"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
     <android.support.v7.widget.RecyclerView
         android:id="@android:id/list"
-        android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
 
     <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
-        app:rfs_barColor="@color/colorAccent"
-        app:rfs_handleColor="@color/colorAccent"
-        app:rfs_handleBackground="@drawable/handle"
         android:id="@+id/fast_scroller"
         android:layout_width="25dp"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentRight="true"
+        app:rfs_barColor="@color/colorAccent"
+        app:rfs_handleBackground="@drawable/handle"
+        app:rfs_handleColor="@color/colorAccent" />
 
     <com.onegravity.contactpicker.contact.ContactSectionIndexer
         android:id="@+id/fast_scroller_section_title_indicator"
@@ -32,11 +31,11 @@
 
     <TextView
         android:id="@android:id/empty"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:gravity="center"
+        android:text="@string/cp_no_contacts"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/cp_no_contacts"/>
+        android:visibility="gone" />
 </RelativeLayout>

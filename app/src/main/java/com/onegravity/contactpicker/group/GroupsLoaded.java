@@ -22,21 +22,21 @@ import java.util.List;
 
 /**
  * All groups have been loaded.
- *
+ * <p>
  * Publisher: ContactPickerActivity
  * Subscriber: GroupFragment
  */
 public class GroupsLoaded {
 
-    public static void post(List<? extends Group> groups) {
-        GroupsLoaded event = new GroupsLoaded(groups);
-        EventBus.getDefault().postSticky(event);
-    }
-
     final private List<? extends Group> mGroups;
 
     private GroupsLoaded(List<? extends Group> groups) {
         mGroups = groups;
+    }
+
+    public static void post(List<? extends Group> groups) {
+        GroupsLoaded event = new GroupsLoaded(groups);
+        EventBus.getDefault().postSticky(event);
     }
 
     public List<? extends Group> getGroups() {

@@ -63,7 +63,7 @@ public class GroupViewHolder extends RecyclerView.ViewHolder {
 
         // check box
         mSelect.setOnCheckedChangeListener(null);
-        mSelect.setChecked( group.isChecked() );
+        mSelect.setChecked(group.isChecked());
         mSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

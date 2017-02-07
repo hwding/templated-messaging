@@ -53,7 +53,8 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 return ContactFragment.newInstance(mSortOrder, mBadgeType, mDescription, mDescriptionType);
             case 1:
                 return GroupFragment.newInstance();
-            default: return null;
+            default:
+                return null;
         }
     }
 

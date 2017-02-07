@@ -25,6 +25,11 @@ public class ContactUriCache extends InMemoryCache<String, Uri> {
 
     private static ContactUriCache sInstance;
 
+    private ContactUriCache() {
+        // purge after 10 minutes of being idle, holds a maximum of 100 URIs
+        super(1000 * 60 * 10, 100);
+    }
+
     // we need to synchronize this to make sure there's no race condition instantiating the cache
     public synchronized static ContactUriCache getInstance() {
         if (sInstance == null) {
@@ -43,11 +48,6 @@ public class ContactUriCache extends InMemoryCache<String, Uri> {
      */
     public static Uri getUriFromCache(String key) {
         return getInstance().get(key, Uri.EMPTY);
-    }
-
-    private ContactUriCache() {
-        // purge after 10 minutes of being idle, holds a maximum of 100 URIs
-        super(1000 * 60 * 10, 100);
     }
 
 }

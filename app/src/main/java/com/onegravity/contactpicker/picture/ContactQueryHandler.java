@@ -28,15 +28,9 @@ import com.onegravity.contactpicker.Helper;
 
 public class ContactQueryHandler extends AsyncQueryHandler {
 
-    public interface ContactQueryHandlerCallback {
-        void onQueryComplete(int token, Uri uri, Bundle extras, boolean trigger, Uri createUri);
-    }
-
     private final String[] mExcludeMimes;
-
     private int mToken;
     private boolean mCancelled;
-
     private ContactQueryHandlerCallback mCallback;
 
     public ContactQueryHandler(Context context, String[] excludeMimes) {
@@ -66,7 +60,7 @@ public class ContactQueryHandler extends AsyncQueryHandler {
         boolean trigger = false;
         Bundle extras = (cookie != null) ? (Bundle) cookie : new Bundle();
         try {
-            switch(token) {
+            switch (token) {
                 case Constants.TOKEN_PHONE_LOOKUP_AND_TRIGGER:
                     trigger = true;
                     createUri = Uri.fromParts("tel", extras.getString(Constants.EXTRA_URI_CONTENT), null);
@@ -98,17 +92,19 @@ public class ContactQueryHandler extends AsyncQueryHandler {
                     break;
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.w(getClass().getSimpleName(), "Failed to get data: " + e.getMessage());
-        }
-        finally {
+        } finally {
             Helper.closeQuietly(cursor);
         }
 
         if (mCancelled) return;
 
         mCallback.onQueryComplete(token, lookupUri, extras, trigger, createUri);
+    }
+
+    public interface ContactQueryHandlerCallback {
+        void onQueryComplete(int token, Uri uri, Bundle extras, boolean trigger, Uri createUri);
     }
 
 }

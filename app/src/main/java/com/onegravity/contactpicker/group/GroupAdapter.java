@@ -54,7 +54,7 @@ class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
     @Override
     public void onBindViewHolder(GroupViewHolder holder, int position) {
         if (mGroups != null) {
-            holder.bind( mGroups.get(position) );
+            holder.bind(mGroups.get(position));
         }
     }
 

@@ -52,17 +52,6 @@ public class ContactPictureLoader implements Runnable {
         mRoundContactPictures = roundContactPictures;
     }
 
-    @Override
-    public void run() {
-        ContactBadge badge = mBadge.get();
-        if (badge == null) return; // fail fast
-
-        Bitmap bitmap = retrievePicture(badge.getContext(), mPhotoUri, mRoundContactPictures);
-        if (bitmap != null) {
-            ContactPictureLoaded.post(mKey, badge, bitmap);
-        }
-    }
-
     public static Bitmap retrievePicture(Context context, Uri photoUri, boolean roundContactPictures) {
         if (context == null || photoUri == null || Helper.isNullOrEmpty(photoUri.toString())) {
             return null;
@@ -92,9 +81,8 @@ public class ContactPictureLoader implements Runnable {
                     bitmap = getRoundedBitmap(bitmap);
                 }
             }
-        }
-        catch (OutOfMemoryError | FileNotFoundException ignore) {}
-        finally {
+        } catch (OutOfMemoryError | FileNotFoundException ignore) {
+        } finally {
             Helper.closeQuietly(stream);
         }
 
@@ -122,6 +110,17 @@ public class ContactPictureLoader implements Runnable {
         canvas.drawOval(rectF, paint);
 
         return output;
+    }
+
+    @Override
+    public void run() {
+        ContactBadge badge = mBadge.get();
+        if (badge == null) return; // fail fast
+
+        Bitmap bitmap = retrievePicture(badge.getContext(), mPhotoUri, mRoundContactPictures);
+        if (bitmap != null) {
+            ContactPictureLoaded.post(mKey, badge, bitmap);
+        }
     }
 
 }

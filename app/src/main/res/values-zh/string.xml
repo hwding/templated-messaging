@@ -26,8 +26,7 @@
     <string name="cp_no_contacts">无联系人</string>
     <string name="cp_no_groups">无群组</string>
 
-    <plurals
-        name="cp_group_description">
+    <plurals name="cp_group_description">
         <item quantity="one">(%1$d个联系人)</item>
         <item quantity="other">(%1$d个联系人)</item>
     </plurals>

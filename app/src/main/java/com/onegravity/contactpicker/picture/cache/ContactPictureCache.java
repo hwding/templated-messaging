@@ -26,6 +26,11 @@ public class ContactPictureCache extends InMemoryCache<Uri, Bitmap> {
     private static ContactPictureCache sInstance;
     private static int sMemClass;
 
+    private ContactPictureCache() {
+        // purge after 5 minutes of being idle, the cacheCapacity parameter is ignored
+        super(1000 * 60 * 5, 50);
+    }
+
     // we need to synchronize this to make sure there's no race condition instantiating the cache
     public synchronized static ContactPictureCache getInstance(Context context) {
         if (sInstance == null) {
@@ -34,11 +39,6 @@ public class ContactPictureCache extends InMemoryCache<Uri, Bitmap> {
             sInstance = new ContactPictureCache();
         }
         return sInstance;
-    }
-
-    private ContactPictureCache() {
-        // purge after 5 minutes of being idle, the cacheCapacity parameter is ignored
-        super(1000 * 60 * 5, 50);
     }
 
     @Override

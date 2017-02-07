@@ -57,6 +57,9 @@ public class ContactFragment extends BaseFragment {
 
     private ContactAdapter mAdapter;
 
+    public ContactFragment() {
+    }
+
     public static ContactFragment newInstance(ContactSortOrder sortOrder,
                                               ContactPictureType pictureType,
                                               ContactDescription contactDescription,
@@ -71,16 +74,14 @@ public class ContactFragment extends BaseFragment {
         return fragment;
     }
 
-    public ContactFragment() {}
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        mSortOrder = ContactSortOrder.lookup( args.getString("sortOrder") );
-        mPictureType = ContactPictureType.lookup( args.getString("pictureType") );
-        mDescription = ContactDescription.lookup( args.getString("contactDescription") );
+        mSortOrder = ContactSortOrder.lookup(args.getString("sortOrder"));
+        mPictureType = ContactPictureType.lookup(args.getString("pictureType"));
+        mDescription = ContactDescription.lookup(args.getString("contactDescription"));
         mDescriptionType = args.getInt("descriptionType");
     }
 
@@ -97,7 +98,7 @@ public class ContactFragment extends BaseFragment {
         recyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
 
         // configure section indexer
-        SectionTitleIndicator sectionTitleIndicator = (SectionTitleIndicator ) rootLayout.findViewById(R.id.fast_scroller_section_title_indicator);
+        SectionTitleIndicator sectionTitleIndicator = (SectionTitleIndicator) rootLayout.findViewById(R.id.fast_scroller_section_title_indicator);
         fastScroller.setSectionIndicator(sectionTitleIndicator);
 
         return rootLayout;
@@ -121,14 +122,14 @@ public class ContactFragment extends BaseFragment {
         // determine if all contacts are checked
         boolean allChecked = true;
         for (Contact contact : mFilteredContacts) {
-            if (! contact.isChecked()) {
+            if (!contact.isChecked()) {
                 allChecked = false;
                 break;
             }
         }
 
         // if all are checked then un-check the contacts, otherwise check them all
-        boolean isChecked = ! allChecked;
+        boolean isChecked = !allChecked;
         for (Contact contact : mFilteredContacts) {
             if (contact.isChecked() != isChecked) {
                 contact.setChecked(isChecked, true);
@@ -146,8 +147,7 @@ public class ContactFragment extends BaseFragment {
 
         if (queryStrings == null || queryStrings.length == 0) {
             mFilteredContacts = mContacts;
-        }
-        else {
+        } else {
             List<Contact> filteredElements = new ArrayList<>();
             for (Contact contact : mContacts) {
                 if (contact.matchesQuery(queryStrings)) {

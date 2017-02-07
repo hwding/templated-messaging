@@ -30,15 +30,15 @@ public class ContactPictureLoaded {
     private final ContactBadge mBadge;
     private final Bitmap mBitmap;
 
-    static void post(String key, ContactBadge badge, Bitmap bitmap) {
-        ContactPictureLoaded event = new ContactPictureLoaded(key, badge, bitmap);
-        EventBus.getDefault().post(event);
-    }
-
     private ContactPictureLoaded(String key, ContactBadge badge, Bitmap bitmap) {
         mKey = key;
         mBadge = badge;
         mBitmap = bitmap;
+    }
+
+    static void post(String key, ContactBadge badge, Bitmap bitmap) {
+        ContactPictureLoaded event = new ContactPictureLoaded(key, badge, bitmap);
+        EventBus.getDefault().post(event);
     }
 
     ContactBadge getBadge() {

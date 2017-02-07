@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/select_container"
     android:layout_width="wrap_content"
@@ -11,12 +10,12 @@
     android:gravity="center">
 
     <CheckBox
-        android:buttonTint="#6b982b"
         android:id="@+id/select"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="5dip"
+        android:buttonTint="#6b982b"
         android:focusable="false"
         android:gravity="center"
         tools:targetApi="lollipop" />

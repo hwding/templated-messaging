@@ -26,8 +26,7 @@ public enum ContactPictureType {
     public static ContactPictureType lookup(String name) {
         try {
             return ContactPictureType.valueOf(name);
-        }
-        catch (IllegalArgumentException ignore) {
+        } catch (IllegalArgumentException ignore) {
             Log.e(ContactPictureType.class.getSimpleName(), ignore.getMessage());
             return ROUND;
         }

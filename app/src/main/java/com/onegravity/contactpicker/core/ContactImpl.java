@@ -64,6 +64,25 @@ public class ContactImpl extends ContactElementImpl implements Contact {
             0xff9E9E9E,
             0xff607D8B
     };
+    final private String mLookupKey;
+    private String mFirstName = "";
+    private String mLastName = "";
+    private Map<Integer, String> mEmail = new HashMap<>();
+    private Map<Integer, String> mPhone = new HashMap<>();
+    private Map<Integer, String> mAddress = new HashMap<>();
+    private String mPhotoUri;
+    private Set<Long> mGroupIds = new HashSet<>();
+    private char mContactLetterBadge;
+    private char mContactLetterScroll;
+    private Integer mContactColor;
+    protected ContactImpl(long id, String lookupKey, String displayName, String firstName, String lastName, Uri photoUri) {
+        super(id, displayName);
+
+        mLookupKey = lookupKey;
+        mFirstName = Helper.isNullOrEmpty(firstName) ? "---" : firstName;
+        mLastName = Helper.isNullOrEmpty(lastName) ? "---" : lastName;
+        setPhotoUri(photoUri);
+    }
 
     static ContactImpl fromCursor(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -77,36 +96,22 @@ public class ContactImpl extends ContactElementImpl implements Contact {
         return new ContactImpl(id, lookupKey, displayName, firstName, lastName, uri);
     }
 
-    final private String mLookupKey;
-    private String mFirstName = "";
-    private String mLastName = "";
-    private Map<Integer, String> mEmail = new HashMap<>();
-    private Map<Integer, String> mPhone = new HashMap<>();
-    private Map<Integer, String> mAddress = new HashMap<>();
-    private String mPhotoUri;
-    private Set<Long> mGroupIds = new HashSet<>();
-
-    private char mContactLetterBadge;
-    private char mContactLetterScroll;
-    private Integer mContactColor;
-
-    protected ContactImpl(long id, String lookupKey, String displayName, String firstName, String lastName, Uri photoUri) {
-        super(id, displayName);
-
-        mLookupKey = lookupKey;
-        mFirstName = Helper.isNullOrEmpty(firstName) ? "---" : firstName;
-        mLastName = Helper.isNullOrEmpty(lastName) ? "---" : lastName;
-        setPhotoUri(photoUri);
-    }
-
     @Override
     public String getFirstName() {
         return mFirstName;
     }
 
+    protected void setFirstName(String value) {
+        mFirstName = value;
+    }
+
     @Override
     public String getLastName() {
         return mLastName;
+    }
+
+    protected void setLastName(String value) {
+        mLastName = value;
     }
 
     @Override
@@ -152,9 +157,15 @@ public class ContactImpl extends ContactElementImpl implements Contact {
         if (mContactLetterScroll == 0) {
             String name;
             switch (sortOrder) {
-                case FIRST_NAME: name = getFirstName(); break;
-                case LAST_NAME: name = getLastName(); break;
-                default: name = getDisplayName(); break;
+                case FIRST_NAME:
+                    name = getFirstName();
+                    break;
+                case LAST_NAME:
+                    name = getLastName();
+                    break;
+                default:
+                    name = getDisplayName();
+                    break;
             }
             mContactLetterScroll = Helper.isNullOrEmpty(name) ? '?' :
                     name.toUpperCase(Locale.getDefault()).charAt(0);
@@ -176,7 +187,7 @@ public class ContactImpl extends ContactElementImpl implements Contact {
     /**
      * Matches:
      * https://developer.android.com/reference/android/provider/ContactsContract.ContactsColumns.html#LOOKUP_KEY
-     *
+     * <p>
      * Used as unique key to cache contact pictures for a specific contact and also to create the
      * contact Uri: ContactsContract.Contacts.CONTENT_LOOKUP_URI + "/" + LOOKUP_KEY
      */
@@ -190,17 +201,13 @@ public class ContactImpl extends ContactElementImpl implements Contact {
         return mPhotoUri != null ? Uri.parse(mPhotoUri) : null;
     }
 
+    protected void setPhotoUri(Uri photoUri) {
+        mPhotoUri = photoUri != null ? photoUri.toString() : null;
+    }
+
     @Override
     public Set<Long> getGroupIds() {
         return mGroupIds;
-    }
-
-    protected void setFirstName(String value) {
-        mFirstName = value;
-    }
-
-    protected void setLastName(String value) {
-        mLastName = value;
     }
 
     protected void setEmail(int type, String value) {
@@ -213,10 +220,6 @@ public class ContactImpl extends ContactElementImpl implements Contact {
 
     protected void setAddress(int type, String value) {
         mAddress.put(type, value);
-    }
-
-    protected void setPhotoUri(Uri photoUri) {
-        mPhotoUri = photoUri != null ? photoUri.toString() : null;
     }
 
     void addGroupId(long value) {

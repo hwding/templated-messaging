@@ -58,7 +58,7 @@ import static com.onegravity.contactpicker.picture.Constants.TOKEN_PHONE_LOOKUP;
 
 /**
  * The ContactBadge.
- *
+ * <p>
  * Derived from {@link android.widget.QuickContactBadge}.
  */
 public class ContactBadge extends View implements OnClickListener {
@@ -66,40 +66,51 @@ public class ContactBadge extends View implements OnClickListener {
      * Resize the pictures to the following value (device-independent pixels).
      */
     public static final float STANDARD_PICTURE_SIZE = 40f;
+    private final int mSizeInPx;
+    protected String[] mExcludeMimes = null;
     private Uri mContactUri;
     private String mContactEmail;
     private String mContactPhone;
+    ContactQueryHandler.ContactQueryHandlerCallback mContactQueryHandlerCallback =
+            new ContactQueryHandler.ContactQueryHandlerCallback() {
+                @Override
+                public void onQueryComplete(int token, Uri uri, Bundle extras, boolean trigger, Uri createUri) {
+                    assignContactUri(uri);
+                    if (trigger && uri != null) {
+                        // Found contact, so trigger QuickContact
+                        ContactsContract.QuickContact.showQuickContact(getContext(),
+                                ContactBadge.this, uri, ContactsContract.QuickContact.MODE_LARGE, mExcludeMimes);
+                    } else if (createUri != null) {
+                        // Prompt user to add this person to contacts
+                        final Intent intent = new Intent(ContactsContract.Intents.SHOW_OR_CREATE_CONTACT, createUri);
+                        if (extras != null) {
+                            extras.remove(Constants.EXTRA_URI_CONTENT);
+                            intent.putExtras(extras);
+                        }
+                        getContext().startActivity(intent);
+                    }
+
+                }
+            };
     private ContactQueryHandler mQueryHandler;
     private Bundle mExtras = null;
-
-    protected String[] mExcludeMimes = null;
-
-    private final int mSizeInPx;
-
     // Bitmap
     private BitmapDrawable mDrawable;
-
     // Character
     private String mChar;
     private Paint mTextPaint;
     private Rect mRect;
-
     // circle (round contact picture)
     private Paint mBackground;
-
     // Chip/Triangle (square contact picture)
     private ShapeDrawable mTriangle;
     private Paint mLinePaint;
     private float mOffset;
-
     // pressed overlay
     private boolean mIsPressed;
     private ShapeDrawable mPressedOverlay;
-
     private boolean mRoundContactPictures = true;
-
     private String mKey;
-
     private float mDensity;
 
     public ContactBadge(Context context) {
@@ -202,6 +213,8 @@ public class ContactBadge extends View implements OnClickListener {
         paint.setAntiAlias(true);
     }
 
+    // ****************************************** Contact Picture Methods *******************************************
+
     public synchronized void onDestroy() {
         mDrawable = null;
         if (mQueryHandler != null) {
@@ -209,8 +222,6 @@ public class ContactBadge extends View implements OnClickListener {
         }
         mQueryHandler = null;
     }
-
-    // ****************************************** Contact Picture Methods *******************************************
 
     public void setBadgeType(ContactPictureType contactPictureType) {
         mRoundContactPictures = contactPictureType == ContactPictureType.ROUND;
@@ -243,6 +254,8 @@ public class ContactBadge extends View implements OnClickListener {
         invalidate();
     }
 
+    // ****************************************** View Methods *******************************************
+
     public void setBitmap(Bitmap bitmap) {
         mChar = null;
         if (mDrawable == null || mDrawable.getBitmap() != bitmap) {
@@ -251,8 +264,6 @@ public class ContactBadge extends View implements OnClickListener {
             invalidate();
         }
     }
-
-    // ****************************************** View Methods *******************************************
 
     @Override
     protected void drawableStateChanged() {
@@ -340,14 +351,14 @@ public class ContactBadge extends View implements OnClickListener {
         event.setClassName(ContactBadge.class.getName());
     }
 
+    // ****************************************** Assign Methods *******************************************
+
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
         super.onInitializeAccessibilityNodeInfo(info);
         info.setClassName(ContactBadge.class.getName());
     }
-
-    // ****************************************** Assign Methods *******************************************
 
     /**
      * True if a contact, an email address or a phone number has been assigned
@@ -475,28 +486,6 @@ public class ContactBadge extends View implements OnClickListener {
             return;
         }
     }
-
-    ContactQueryHandler.ContactQueryHandlerCallback mContactQueryHandlerCallback =
-            new ContactQueryHandler.ContactQueryHandlerCallback() {
-                @Override
-                public void onQueryComplete(int token, Uri uri, Bundle extras, boolean trigger, Uri createUri) {
-                    assignContactUri(uri);
-                    if (trigger && uri != null) {
-                        // Found contact, so trigger QuickContact
-                        ContactsContract.QuickContact.showQuickContact(getContext(),
-                                ContactBadge.this, uri, ContactsContract.QuickContact.MODE_LARGE, mExcludeMimes);
-                    } else if (createUri != null) {
-                        // Prompt user to add this person to contacts
-                        final Intent intent = new Intent(ContactsContract.Intents.SHOW_OR_CREATE_CONTACT, createUri);
-                        if (extras != null) {
-                            extras.remove(Constants.EXTRA_URI_CONTENT);
-                            intent.putExtras(extras);
-                        }
-                        getContext().startActivity(intent);
-                    }
-
-                }
-            };
 
     /**
      * Set a list of specific MIME-types to exclude and not display. For

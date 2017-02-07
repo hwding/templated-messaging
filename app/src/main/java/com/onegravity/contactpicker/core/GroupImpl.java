@@ -33,16 +33,16 @@ import java.util.Map;
  */
 class GroupImpl extends ContactElementImpl implements Group {
 
-    static GroupImpl fromCursor(Cursor cursor) {
-        long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Groups._ID));
-        String title = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.TITLE));
-        return new GroupImpl(id, title);
-    }
-
     private Map<Long, Contact> mContacts = new HashMap<>();
 
     private GroupImpl(long id, String displayName) {
         super(id, displayName);
+    }
+
+    static GroupImpl fromCursor(Cursor cursor) {
+        long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Groups._ID));
+        String title = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.TITLE));
+        return new GroupImpl(id, title);
     }
 
     @Override

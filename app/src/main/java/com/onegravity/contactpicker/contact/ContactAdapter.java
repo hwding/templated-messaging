@@ -34,15 +34,15 @@ import java.util.Map;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> implements SectionIndexer {
 
-    private List<? extends Contact> mContacts;
-
     final private ContactSortOrder mSortOrder;
     final private ContactPictureType mContactPictureType;
     final private ContactDescription mContactDescription;
     final private int mContactDescriptionType;
     final private ContactPictureManager mContactPictureLoader;
-
+    private List<? extends Contact> mContacts;
     private LayoutInflater mInflater;
+    private Map<Character, ContactSection> mSections = new HashMap<>();
+    private ContactSection[] mSectionArray;
 
     public ContactAdapter(Context context, List<Contact> contacts,
                           ContactSortOrder sortOrder,
@@ -96,9 +96,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> impl
     public long getItemId(int position) {
         return mContacts == null ? super.getItemId(position) : mContacts.get(position).getId();
     }
-
-    private Map<Character, ContactSection> mSections = new HashMap<>();
-    private ContactSection[] mSectionArray;
 
     synchronized private void calculateSections() {
         mSections.clear();

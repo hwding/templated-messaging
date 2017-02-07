@@ -37,7 +37,7 @@ public class ContactSectionIndexer extends SectionTitleIndicator<ContactSection>
 
     @Override
     public void setSection(ContactSection section) {
-        setTitleText( section.getLetter() + "");
+        setTitleText(section.getLetter() + "");
     }
 
 }

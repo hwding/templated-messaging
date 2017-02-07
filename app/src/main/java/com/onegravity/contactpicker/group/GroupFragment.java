@@ -47,11 +47,12 @@ public class GroupFragment extends BaseFragment {
 
     private GroupAdapter mAdapter;
 
+    public GroupFragment() {
+    }
+
     public static GroupFragment newInstance() {
         return new GroupFragment();
     }
-
-    public GroupFragment() {}
 
     @Override
     public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,14 +78,14 @@ public class GroupFragment extends BaseFragment {
         // determine if all groups are checked
         boolean allChecked = true;
         for (Group group : mFilteredGroups) {
-            if (! group.isChecked()) {
+            if (!group.isChecked()) {
                 allChecked = false;
                 break;
             }
         }
 
         // if all are checked then un-check the groups, otherwise check them all
-        boolean isChecked = ! allChecked;
+        boolean isChecked = !allChecked;
         for (Group group : mFilteredGroups) {
             if (group.isChecked() != isChecked) {
                 group.setChecked(isChecked, false);
@@ -100,8 +101,7 @@ public class GroupFragment extends BaseFragment {
 
         if (queryStrings == null || queryStrings.length == 0) {
             mFilteredGroups = mGroups;
-        }
-        else {
+        } else {
             List<Group> filteredElements = new ArrayList<>();
             for (Group group : mGroups) {
                 if (group.matchesQuery(queryStrings)) {

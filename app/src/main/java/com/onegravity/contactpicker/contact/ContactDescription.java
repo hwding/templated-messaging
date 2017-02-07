@@ -26,8 +26,7 @@ public enum ContactDescription {
     public static ContactDescription lookup(String name) {
         try {
             return ContactDescription.valueOf(name);
-        }
-        catch (IllegalArgumentException ignore) {
+        } catch (IllegalArgumentException ignore) {
             Log.e(ContactDescription.class.getSimpleName(), ignore.getMessage());
             return ADDRESS;
         }

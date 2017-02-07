@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void generate_var_input(int var_num) {
-        for (int i = 0; i < var_num; i ++) {
+        for (int i = 0; i < var_num; i++) {
             View a = View.inflate(MainActivity.this, R.layout.var_input, null);
             EditText et = (EditText) a.findViewById(R.id.d);
             TextView tv = (TextView) a.findViewById(R.id.f);
@@ -276,13 +276,13 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("result code is " + getResultCode());
                 switch (getResultCode()) {
                     case RESULT_OK:
-                        target_suc ++;
+                        target_suc++;
                         sms_ready_to_send_hashMap.remove(intent.getStringExtra(ITP));
                         break;
                     default:
                         if (!failed_key.contains(intent.getStringExtra(ITP)))
                             failed_key.add(intent.getStringExtra(ITP));
-                        target_fai ++;
+                        target_fai++;
                         break;
                 }
                 if (target_fai + target_suc == target_sum) {
@@ -310,8 +310,7 @@ public class MainActivity extends AppCompatActivity {
                             sms_ready_to_send_hashMap.clear();
                             failed_key.clear();
                         });
-                    }
-                    else {
+                    } else {
                         builder.setMessage(getString(R.string.all_succ));
                         builder.setPositiveButton(getString(R.string.ok), (a, b) -> {
                             chg_all_var_input_et(true, true);
@@ -320,8 +319,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                     }
                     builder.create().show();
-                }
-                else {
+                } else {
                     pd.setMessage(getString(R.string.in_prg) + "   " + ((int) target_fai + (int) target_suc + (int) 1) + "/" + key_array.length);
                     send(target_fai + target_suc);
                 }

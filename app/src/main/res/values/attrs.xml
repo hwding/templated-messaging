@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright (C) 2015-2016 Emanuel Moecklin
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +17,8 @@
 <resources>
 
     <declare-styleable name="Theme">
-        <attr name="cp_textColorPrimary" format="color|reference"/>
-        <attr name="cp_textColorSecondary" format="color|reference"/>
+        <attr name="cp_textColorPrimary" format="color|reference" />
+        <attr name="cp_textColorSecondary" format="color|reference" />
 
         <attr name="cp_badgeLineColor" format="reference" />
         <attr name="cp_badgeTriangleColor" format="reference" />

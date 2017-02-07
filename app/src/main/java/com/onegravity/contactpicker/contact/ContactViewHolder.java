@@ -32,16 +32,15 @@ import com.onegravity.contactpicker.picture.ContactPictureType;
 
 public class ContactViewHolder extends RecyclerView.ViewHolder {
 
+    final private ContactPictureType mContactPictureType;
+    final private ContactDescription mContactDescription;
+    final private int mContactDescriptionType;
+    final private ContactPictureManager mContactPictureLoader;
     private View mRoot;
     private TextView mName;
     private TextView mDescription;
     private ContactBadge mBadge;
     private CheckBox mSelect;
-
-    final private ContactPictureType mContactPictureType;
-    final private ContactDescription mContactDescription;
-    final private int mContactDescriptionType;
-    final private ContactPictureManager mContactPictureLoader;
 
     ContactViewHolder(View root, ContactPictureManager contactPictureLoader, ContactPictureType contactPictureType,
                       ContactDescription contactDescription, int contactDescriptionType) {
@@ -86,13 +85,12 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
                 break;
         }
         mDescription.setText(description);
-        mDescription.setVisibility( Helper.isNullOrEmpty(description) ? View.GONE : View.VISIBLE );
+        mDescription.setVisibility(Helper.isNullOrEmpty(description) ? View.GONE : View.VISIBLE);
 
         // contact picture
         if (mContactPictureType == ContactPictureType.NONE) {
             mBadge.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             mContactPictureLoader.loadContactPicture(contact, mBadge);
             mBadge.setVisibility(View.VISIBLE);
 
@@ -105,7 +103,7 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
 
         // check box
         mSelect.setOnCheckedChangeListener(null);
-        mSelect.setChecked( contact.isChecked() );
+        mSelect.setChecked(contact.isChecked());
         mSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
