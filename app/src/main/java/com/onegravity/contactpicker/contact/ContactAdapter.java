@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> implements SectionIndexer  {
+public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> implements SectionIndexer {
 
     private List<? extends Contact> mContacts;
 
@@ -60,7 +60,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> impl
     public void setData(List<? extends Contact> contacts) {
         mContacts = contacts;
         notifyDataSetChanged();
-        calculateSections();
+        if (!mContacts.isEmpty())
+            calculateSections();
     }
 
     @Override
@@ -71,13 +72,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> impl
 
         View view = mInflater.inflate(R.layout.cp_contact_list_item, parent, false);
         return new ContactViewHolder(view, mContactPictureLoader, mContactPictureType,
-                                     mContactDescription, mContactDescriptionType);
+                mContactDescription, mContactDescriptionType);
     }
 
     @Override
     public void onBindViewHolder(ContactViewHolder holder, int position) {
         if (mContacts != null) {
-            holder.bind( mContacts.get(position) );
+            holder.bind(mContacts.get(position));
         }
     }
 
@@ -130,7 +131,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> impl
     @Override
     public synchronized int getPositionForSection(int sectionPos) {
         if (mSections == null || mSections.isEmpty() ||
-            mContacts == null || mContacts.isEmpty()) return 0;
+                mContacts == null || mContacts.isEmpty()) return 0;
 
         int maxIndexSections = assertBoundaries(mSectionArray.length - 1, 0, mSectionArray.length);
         sectionPos = assertBoundaries(sectionPos, 0, maxIndexSections);
@@ -144,7 +145,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> impl
     @Override
     public synchronized int getSectionForPosition(int contactPosition) {
         if (mSections == null || mSections.isEmpty() ||
-            mContacts == null || mContacts.isEmpty()) return 0;
+                mContacts == null || mContacts.isEmpty()) return 0;
 
         int maxIndexContacts = assertBoundaries(mContacts.size() - 1, 0, mContacts.size());
         contactPosition = assertBoundaries(contactPosition, 0, maxIndexContacts);
